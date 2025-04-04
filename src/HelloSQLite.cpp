@@ -16,8 +16,9 @@ namespace dotname {
       LOG_D_STREAM << "Assets path: " << assetsPath_ << std::endl;
 
       // Open the database
-      dbPtr_ = std::make_unique<SQLite::Database> (std::string (assetsPath_ / "InventDB.db"),
+      dbPtr_ = std::make_unique<SQLite::Database> ((assetsPath_ / "InventDB.db").string (),
                                                    SQLite::OPEN_READWRITE);
+
       buffer_ = std::make_shared<std::vector<std::string> > ();
 
       this->printAll ();
