@@ -22,12 +22,11 @@
       #if __GNUC__ > 8 // MinGW requires GCC version > 8 for std::filesystem
         #define SQLITECPP_HAVE_STD_FILESYSTEM
       #endif
-    #elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)                            \
-      && __MAC_OS_X_VERSION_MIN_REQUIRED < 101500
+    #elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < 101500
     // macOS clang won't let us touch std::filesystem if we're targetting
     // earlier than 10.15
     #elif defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && defined(__IPHONE_13_0) \
-      && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_13_0
+        && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_13_0
     // build for iOS clang won't let us touch std::filesystem if we're
     // targetting earlier than iOS 13
     #else
@@ -61,8 +60,7 @@
 
   #define SQLITECPP_HAVE_STD_FILESYSTEM
   #include <experimental/filesystem>
-namespace std
-{
+namespace std {
   namespace filesystem = experimental::filesystem;
 }
 
@@ -75,17 +73,16 @@ namespace std
 struct sqlite3;
 struct sqlite3_context;
 
-#ifndef SQLITE_USE_LEGACY_STRUCT // Since SQLITE 3.19 (used by default since
+#ifndef SQLITE_USE_LEGACY_STRUCT // Since SQLITE 3.19 (used by default since \
                                  // SQLiteCpp 2.1.0)
 typedef struct sqlite3_value sqlite3_value;
-#else // Before SQLite 3.19 (legacy struct forward declaration can be activated
+#else // Before SQLite 3.19 (legacy struct forward declaration can be activated \
       // with CMake SQLITECPP_LEGACY_STRUCT var)
 struct Mem;
 typedef struct Mem sqlite3_value;
 #endif
 
-namespace SQLite
-{
+namespace SQLite {
 
   // Those public constants enable most usages of SQLiteCpp without including
   // <sqlite3.h> in the client application.
@@ -119,22 +116,21 @@ namespace SQLite
 
   SQLITECPP_API extern const int OK; ///< SQLITE_OK (used by check() bellow)
 
-  SQLITECPP_API extern const char *const
-    VERSION; ///< SQLITE_VERSION string from sqlite3.h used at compile time
+  SQLITECPP_API extern const char* const
+      VERSION; ///< SQLITE_VERSION string from sqlite3.h used at compile time
   SQLITECPP_API extern const int
-    VERSION_NUMBER; ///< SQLITE_VERSION_NUMBER from sqlite3.h used at compile
-                    ///< time
+      VERSION_NUMBER; ///< SQLITE_VERSION_NUMBER from sqlite3.h used at compile
+                      ///< time
 
   /// Return SQLite version string using runtime call to the compiled library
-  SQLITECPP_API const char *getLibVersion () noexcept;
+  SQLITECPP_API const char* getLibVersion () noexcept;
   /// Return SQLite version number using runtime call to the compiled library
   SQLITECPP_API int getLibVersionNumber () noexcept;
 
   // Public structure for representing all fields contained within the SQLite
   // header. Official documentation for fields:
   // https://www.sqlite.org/fileformat.html#the_database_header
-  struct Header
-  {
+  struct Header {
     unsigned char headerStr[16];
     unsigned int pageSizeBytes;
     unsigned char fileFormatWriteVersion;
@@ -178,8 +174,7 @@ namespace SQLite
    * SQLite precompiled statement in a custom shared pointer (See the inner
    * class "Statement::Ptr").
    */
-  class SQLITECPP_API Database
-  {
+  class SQLITECPP_API Database {
     friend class Statement; // Give Statement constructor access to the
                             // mSQLitePtr Connection Handle
 
@@ -206,8 +201,8 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Database (const char *apFilename, const int aFlags = SQLite::OPEN_READONLY,
-              const int aBusyTimeoutMs = 0, const char *apVfs = nullptr);
+    Database (const char* apFilename, const int aFlags = SQLite::OPEN_READONLY,
+              const int aBusyTimeoutMs = 0, const char* apVfs = nullptr);
 
     /**
      * @brief Open the provided database UTF-8 filename.
@@ -231,12 +226,10 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Database (const std::string &aFilename,
-              const int aFlags = SQLite::OPEN_READONLY,
-              const int aBusyTimeoutMs = 0, const std::string &aVfs = "")
-      : Database (aFilename.c_str (), aFlags, aBusyTimeoutMs,
-                  aVfs.empty () ? nullptr : aVfs.c_str ())
-    {
+    Database (const std::string& aFilename, const int aFlags = SQLite::OPEN_READONLY,
+              const int aBusyTimeoutMs = 0, const std::string& aVfs = "")
+        : Database (aFilename.c_str (), aFlags, aBusyTimeoutMs,
+                    aVfs.empty () ? nullptr : aVfs.c_str ()) {
     }
 
 #ifdef SQLITECPP_HAVE_STD_FILESYSTEM
@@ -265,24 +258,21 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Database (const std::filesystem::path &apFilename,
-              const int aFlags = SQLite::OPEN_READONLY,
-              const int aBusyTimeoutMs = 0, const std::string &aVfs = "")
-      : Database (
-          reinterpret_cast<const char *> (apFilename.u8string ().c_str ()),
-          aFlags, aBusyTimeoutMs, aVfs.empty () ? nullptr : aVfs.c_str ())
-    {
+    Database (const std::filesystem::path& apFilename, const int aFlags = SQLite::OPEN_READONLY,
+              const int aBusyTimeoutMs = 0, const std::string& aVfs = "")
+        : Database (reinterpret_cast<const char*> (apFilename.u8string ().c_str ()), aFlags,
+                    aBusyTimeoutMs, aVfs.empty () ? nullptr : aVfs.c_str ()) {
     }
 
 #endif // have std::filesystem
 
     // Database is non-copyable
-    Database (const Database &) = delete;
-    Database &operator= (const Database &) = delete;
+    Database (const Database&) = delete;
+    Database& operator= (const Database&) = delete;
 
     // Database is movable
-    Database (Database &&aDatabase) = default;
-    Database &operator= (Database &&aDatabase) = default;
+    Database (Database&& aDatabase) = default;
+    Database& operator= (Database&& aDatabase) = default;
 
     /**
      * @brief Close the SQLite database connection.
@@ -296,9 +286,8 @@ namespace SQLite
 
     // Deleter functor to use with smart pointers to close the SQLite database
     // connection in an RAII fashion.
-    struct Deleter
-    {
-      SQLITECPP_API void operator() (sqlite3 *apSQLite);
+    struct Deleter {
+      SQLITECPP_API void operator() (sqlite3* apSQLite);
     };
 
     /**
@@ -347,7 +336,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    int exec (const char *apQueries);
+    int exec (const char* apQueries);
 
     /**
      * @brief Shortcut to execute one or multiple statements without results.
@@ -376,7 +365,9 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    int exec (const std::string &aQueries) { return exec (aQueries.c_str ()); }
+    int exec (const std::string& aQueries) {
+      return exec (aQueries.c_str ());
+    }
 
     /**
      * @brief Try to execute one or multiple statements, returning the sqlite
@@ -398,7 +389,7 @@ namespace SQLite
      *
      * @return the sqlite result code.
      */
-    int tryExec (const char *apQueries) noexcept;
+    int tryExec (const char* apQueries) noexcept;
 
     /**
      * @brief Try to execute one or multiple statements, returning the sqlite
@@ -420,8 +411,7 @@ namespace SQLite
      *
      * @return the sqlite result code.
      */
-    int tryExec (const std::string &aQueries) noexcept
-    {
+    int tryExec (const std::string& aQueries) noexcept {
       return tryExec (aQueries.c_str ());
     }
 
@@ -447,7 +437,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Column execAndGet (const char *apQuery);
+    Column execAndGet (const char* apQuery);
 
     /**
      * @brief Shortcut to execute a one step query and fetch the first column
@@ -471,8 +461,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Column execAndGet (const std::string &aQuery)
-    {
+    Column execAndGet (const std::string& aQuery) {
       return execAndGet (aQuery.c_str ());
     }
 
@@ -487,7 +476,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    bool tableExists (const char *apTableName) const;
+    bool tableExists (const char* apTableName) const;
 
     /**
      * @brief Shortcut to test if a table exists.
@@ -500,8 +489,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    bool tableExists (const std::string &aTableName) const
-    {
+    bool tableExists (const std::string& aTableName) const {
       return tableExists (aTableName.c_str ());
     }
 
@@ -534,10 +522,12 @@ namespace SQLite
     int getExtendedErrorCode () const noexcept;
     /// Return UTF-8 encoded English language explanation of the most recent
     /// failed API call (if any).
-    const char *getErrorMsg () const noexcept;
+    const char* getErrorMsg () const noexcept;
 
     /// Return the filename used to open the database.
-    const std::string &getFilename () const noexcept { return mFilename; }
+    const std::string& getFilename () const noexcept {
+      return mFilename;
+    }
 
     /**
      * @brief Return raw pointer to SQLite Database Connection Handle.
@@ -545,7 +535,9 @@ namespace SQLite
      * This is often needed to mix this wrapper with other libraries or for
      * advance usage not supported by SQLiteCpp.
      */
-    sqlite3 *getHandle () const noexcept { return mSQLitePtr.get (); }
+    sqlite3* getHandle () const noexcept {
+      return mSQLitePtr.get ();
+    }
 
     /**
      * @brief Create or redefine a SQL function or aggregate in the sqlite
@@ -574,13 +566,12 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    void createFunction (
-      const char *apFuncName, int aNbArg, bool abDeterministic, void *apApp,
-      void (*apFunc) (sqlite3_context *, int, sqlite3_value **),
-      void (*apStep) (sqlite3_context *, int, sqlite3_value **) = nullptr,
-      void (*apFinal) (sqlite3_context *)
-      = nullptr, // NOLINT(readability/casting)
-      void (*apDestroy) (void *) = nullptr);
+    void createFunction (const char* apFuncName, int aNbArg, bool abDeterministic, void* apApp,
+                         void (*apFunc) (sqlite3_context*, int, sqlite3_value**),
+                         void (*apStep) (sqlite3_context*, int, sqlite3_value**) = nullptr,
+                         void (*apFinal) (sqlite3_context*)
+                         = nullptr, // NOLINT(readability/casting)
+                         void (*apDestroy) (void*) = nullptr);
 
     /**
      * @brief Load a module into the current sqlite database instance.
@@ -600,8 +591,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    void loadExtension (const char *apExtensionName,
-                        const char *apEntryPointName);
+    void loadExtension (const char* apExtensionName, const char* apEntryPointName);
 
     /**
      * @brief Set the key for the current sqlite database instance.
@@ -614,7 +604,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    void key (const std::string &aKey) const;
+    void key (const std::string& aKey) const;
 
     /**
      * @brief Reset the key for the current sqlite database instance.
@@ -632,7 +622,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    void rekey (const std::string &aNewKey) const;
+    void rekey (const std::string& aNewKey) const;
 
     /**
      * @brief Test if a file contains an unencrypted database.
@@ -648,7 +638,7 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    static bool isUnencrypted (const std::string &aFilename);
+    static bool isUnencrypted (const std::string& aFilename);
 
     /**
      * @brief Parse SQLite header data from a database file.
@@ -663,19 +653,17 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    static Header getHeaderInfo (const std::string &aFilename);
+    static Header getHeaderInfo (const std::string& aFilename);
 
     // Parse SQLite header data from a database file.
-    Header getHeaderInfo () const { return getHeaderInfo (mFilename); }
+    Header getHeaderInfo () const {
+      return getHeaderInfo (mFilename);
+    }
 
     /**
      * @brief BackupType for the backup() method
      */
-    enum BackupType
-    {
-      Save,
-      Load
-    };
+    enum BackupType { Save, Load };
 
     /**
      * @brief Load or save the database content.
@@ -686,16 +674,14 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    void backup (const char *apFilename, BackupType aType);
+    void backup (const char* apFilename, BackupType aType);
 
     /**
      * @brief Check if aRet equal SQLITE_OK, else throw a SQLite::Exception
      * with the SQLite error message
      */
-    void check (const int aRet) const
-    {
-      if (SQLite::OK != aRet)
-      {
+    void check (const int aRet) const {
+      if (SQLite::OK != aRet) {
         throw SQLite::Exception (getHandle (), aRet);
       }
     }
@@ -703,9 +689,8 @@ namespace SQLite
   private:
     // TODO: perhaps switch to having Statement sharing a pointer to the
     // Connexion
-    std::unique_ptr<sqlite3, Deleter>
-      mSQLitePtr;          ///< Pointer to SQLite Database Connection Handle
-    std::string mFilename; ///< UTF-8 filename used to open the database
+    std::unique_ptr<sqlite3, Deleter> mSQLitePtr; ///< Pointer to SQLite Database Connection Handle
+    std::string mFilename;                        ///< UTF-8 filename used to open the database
   };
 
 } // namespace SQLite

@@ -17,13 +17,11 @@
 #include <SQLiteCpp/Savepoint.h>
 #include <SQLiteCpp/Statement.h>
 
-namespace SQLite
-{
+namespace SQLite {
 
   // Begins the SQLite savepoint
-  Savepoint::Savepoint (Database &aDatabase, const std::string &aName)
-    : mDatabase (aDatabase), msName (aName)
-  {
+  Savepoint::Savepoint (Database& aDatabase, const std::string& aName)
+      : mDatabase (aDatabase), msName (aName) {
     // workaround because you cannot bind to SAVEPOINT
     // escape name for use in query
     Statement stmt (mDatabase, "SELECT quote(?)");
@@ -35,17 +33,12 @@ namespace SQLite
   }
 
   // Safely rollback the savepoint if it has not been committed.
-  Savepoint::~Savepoint ()
-  {
-    if (!mbReleased)
-    {
-      try
-      {
+  Savepoint::~Savepoint () {
+    if (!mbReleased) {
+      try {
         rollback ();
         release ();
-      }
-      catch (SQLite::Exception &)
-      {
+      } catch (SQLite::Exception&) {
         // Never throw an exception in a destructor: error if already released,
         // but no harm is caused by this.
       }
@@ -53,28 +46,20 @@ namespace SQLite
   }
 
   // Release the savepoint and commit
-  void Savepoint::release ()
-  {
-    if (!mbReleased)
-    {
+  void Savepoint::release () {
+    if (!mbReleased) {
       mDatabase.exec (std::string ("RELEASE SAVEPOINT ") + msName);
       mbReleased = true;
-    }
-    else
-    {
+    } else {
       throw SQLite::Exception ("Savepoint already released.");
     }
   }
 
   // Rollback to the savepoint, but don't release it
-  void Savepoint::rollbackTo ()
-  {
-    if (!mbReleased)
-    {
+  void Savepoint::rollbackTo () {
+    if (!mbReleased) {
       mDatabase.exec (std::string ("ROLLBACK TO SAVEPOINT ") + msName);
-    }
-    else
-    {
+    } else {
       throw SQLite::Exception ("Savepoint already released.");
     }
   }

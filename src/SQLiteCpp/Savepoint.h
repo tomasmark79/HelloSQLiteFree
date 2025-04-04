@@ -16,8 +16,7 @@
 #include <SQLiteCpp/SQLiteCppExport.h>
 #include <SQLiteCpp/Exception.h>
 
-namespace SQLite
-{
+namespace SQLite {
 
   // Forward declaration
   class Database;
@@ -59,8 +58,7 @@ namespace SQLite
    * SQLite precompiled statement in a custom shared pointer (See the inner
    * class "Statement::Ptr").
    */
-  class SQLITECPP_API Savepoint
-  {
+  class SQLITECPP_API Savepoint {
   public:
     /**
      * @brief Begins the SQLite savepoint
@@ -71,11 +69,11 @@ namespace SQLite
      * Exception is thrown in case of error, then the Savepoint is NOT
      * initiated.
      */
-    Savepoint (Database &aDatabase, const std::string &aName);
+    Savepoint (Database& aDatabase, const std::string& aName);
 
     // Savepoint is non-copyable
-    Savepoint (const Savepoint &) = delete;
-    Savepoint &operator= (const Savepoint &) = delete;
+    Savepoint (const Savepoint&) = delete;
+    Savepoint& operator= (const Savepoint&) = delete;
 
     /**
      * @brief Safely rollback the savepoint if it has not been committed.
@@ -92,10 +90,12 @@ namespace SQLite
      */
     void rollbackTo ();
     // @deprecated same as rollbackTo();
-    void rollback () { rollbackTo (); }
+    void rollback () {
+      rollbackTo ();
+    }
 
   private:
-    Database &mDatabase;     ///< Reference to the SQLite Database Connection
+    Database& mDatabase;     ///< Reference to the SQLite Database Connection
     std::string msName;      ///< Name of the Savepoint
     bool mbReleased = false; ///< True when release has been called
   };

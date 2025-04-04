@@ -14,8 +14,8 @@
 
 #include <SQLiteCpp/Statement.h>
 
-#if (__cplusplus >= 201402L)                                                  \
-  || (defined(_MSC_VER) && (_MSC_VER >= 1900)) // c++14: Visual Studio 2015
+#if (__cplusplus >= 201402L) \
+    || (defined(_MSC_VER) && (_MSC_VER >= 1900)) // c++14: Visual Studio 2015
   #include <tuple>
 #endif // c++14
 
@@ -23,8 +23,7 @@
 #include <utility>
 #include <initializer_list>
 
-namespace SQLite
-{
+namespace SQLite {
   /// @endcond
 
   /**
@@ -46,16 +45,14 @@ namespace SQLite
    * @param query     statement
    * @param args      zero or more args to bind.
    */
-  template <class... Args>
-  void bind (SQLite::Statement &query, const Args &...args)
-  {
+  template <class... Args> void bind (SQLite::Statement& query, const Args&... args) {
     int pos = 0;
     (void)std::initializer_list<int>{ (
-      (void)query.bind (++pos, std::forward<decltype (args)> (args)), 0)... };
+        (void)query.bind (++pos, std::forward<decltype (args)> (args)), 0)... };
   }
 
-#if (__cplusplus >= 201402L)                                                  \
-  || (defined(_MSC_VER) && (_MSC_VER >= 1900)) // c++14: Visual Studio 2015
+#if (__cplusplus >= 201402L) \
+    || (defined(_MSC_VER) && (_MSC_VER >= 1900)) // c++14: Visual Studio 2015
 
   /**
    * \brief Convenience function for calling Statement::bind(...) once for each
@@ -75,8 +72,7 @@ namespace SQLite
    * @param tuple     tuple with values to bind
    */
   template <typename... Types>
-  void bind (SQLite::Statement &query, const std::tuple<Types...> &tuple)
-  {
+  void bind (SQLite::Statement& query, const std::tuple<Types...>& tuple) {
     bind (query, tuple, std::index_sequence_for<Types...> ());
   }
 
@@ -91,9 +87,8 @@ namespace SQLite
    * @param tuple     tuple with values to bind
    */
   template <typename... Types, std::size_t... Indices>
-  void bind (SQLite::Statement &query, const std::tuple<Types...> &tuple,
-             std::index_sequence<Indices...>)
-  {
+  void bind (SQLite::Statement& query, const std::tuple<Types...>& tuple,
+             std::index_sequence<Indices...>) {
     bind (query, std::get<Indices> (tuple)...);
   }
 #endif // c++14

@@ -23,8 +23,7 @@
 struct sqlite3;
 struct sqlite3_stmt;
 
-namespace SQLite
-{
+namespace SQLite {
 
   // Forward declaration
   class Database;
@@ -51,8 +50,7 @@ namespace SQLite
    * SQLite precompiled statement in a custom shared pointer (See the inner
    * class "Statement::Ptr").
    */
-  class SQLITECPP_API Statement
-  {
+  class SQLITECPP_API Statement {
   public:
     /**
      * @brief Compile and register the SQL query for the provided SQLite
@@ -64,7 +62,7 @@ namespace SQLite
      * Exception is thrown in case of error, then the Statement object is NOT
      * constructed.
      */
-    Statement (const Database &aDatabase, const char *apQuery);
+    Statement (const Database& aDatabase, const char* apQuery);
 
     /**
      * @brief Compile and register the SQL query for the provided SQLite
@@ -76,18 +74,17 @@ namespace SQLite
      * Exception is thrown in case of error, then the Statement object is NOT
      * constructed.
      */
-    Statement (const Database &aDatabase, const std::string &aQuery)
-      : Statement (aDatabase, aQuery.c_str ())
-    {
+    Statement (const Database& aDatabase, const std::string& aQuery)
+        : Statement (aDatabase, aQuery.c_str ()) {
     }
 
     // Statement is non-copyable
-    Statement (const Statement &) = delete;
-    Statement &operator= (const Statement &) = delete;
+    Statement (const Statement&) = delete;
+    Statement& operator= (const Statement&) = delete;
 
     // Statement is movable
-    Statement (Statement &&aStatement) noexcept;
-    Statement &operator= (Statement &&aStatement) = default;
+    Statement (Statement&& aStatement) noexcept;
+    Statement& operator= (Statement&& aStatement) = default;
 
     /// Finalize and unregister the SQL query from the SQLite Database
     /// Connection. The finalization will be done by the destructor of the last
@@ -132,7 +129,7 @@ namespace SQLite
     // => if you know what you are doing, use bindNoCopy() instead of bind()
 
     SQLITECPP_PURE_FUNC
-    int getIndex (const char *const apName) const;
+    int getIndex (const char* const apName) const;
 
     /**
      * @brief Bind an int value to a parameter "?", "?NNN", ":VVV", "@VVV" or
@@ -161,7 +158,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const int aIndex, const std::string &aValue);
+    void bind (const int aIndex, const std::string& aValue);
     /**
      * @brief Bind a text value to a parameter "?", "?NNN", ":VVV", "@VVV" or
      * "$VVV" in the SQL prepared statement (aIndex >= 1)
@@ -169,7 +166,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const int aIndex, const char *apValue);
+    void bind (const int aIndex, const char* apValue);
     /**
      * @brief Bind a binary blob value to a parameter "?", "?NNN", ":VVV",
      * "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
@@ -177,7 +174,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const int aIndex, const void *apValue, const int aSize);
+    void bind (const int aIndex, const void* apValue, const int aSize);
     /**
      * @brief Bind a string value to a parameter "?", "?NNN", ":VVV", "@VVV" or
      * "$VVV" in the SQL prepared statement (aIndex >= 1).
@@ -187,7 +184,7 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const int aIndex, const std::string &aValue);
+    void bindNoCopy (const int aIndex, const std::string& aValue);
     /**
      * @brief Bind a text value to a parameter "?", "?NNN", ":VVV", "@VVV" or
      * "$VVV" in the SQL prepared statement (aIndex >= 1)
@@ -198,7 +195,7 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const int aIndex, const char *apValue);
+    void bindNoCopy (const int aIndex, const char* apValue);
     /**
      * @brief Bind a binary blob value to a parameter "?", "?NNN", ":VVV",
      * "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
@@ -206,12 +203,12 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const int aIndex, const void *apValue, const int aSize);
+    void bindNoCopy (const int aIndex, const void* apValue, const int aSize);
     /**
      * @brief Deleted, because the value's lifetime could not be guaranteed.
      * Use bind().
      */
-    void bindNoCopy (const int aIndex, std::string &&aValue) = delete;
+    void bindNoCopy (const int aIndex, std::string&& aValue) = delete;
 
     /**
      * @brief Bind a NULL value to a parameter "?", "?NNN", ":VVV", "@VVV" or
@@ -225,32 +222,28 @@ namespace SQLite
      * @brief Bind an int value to a named parameter "?NNN", ":VVV", "@VVV" or
      * "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const char *apName, const int32_t aValue)
-    {
+    void bind (const char* apName, const int32_t aValue) {
       bind (getIndex (apName), aValue);
     }
     /**
      * @brief Bind a 32bits unsigned int value to a named parameter "?NNN",
      * ":VVV", "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const char *apName, const uint32_t aValue)
-    {
+    void bind (const char* apName, const uint32_t aValue) {
       bind (getIndex (apName), aValue);
     }
     /**
      * @brief Bind a 64bits int value to a named parameter "?NNN", ":VVV",
      * "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const char *apName, const int64_t aValue)
-    {
+    void bind (const char* apName, const int64_t aValue) {
       bind (getIndex (apName), aValue);
     }
     /**
      * @brief Bind a double (64bits float) value to a named parameter "?NNN",
      * ":VVV", "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const char *apName, const double aValue)
-    {
+    void bind (const char* apName, const double aValue) {
       bind (getIndex (apName), aValue);
     }
     /**
@@ -260,8 +253,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const char *apName, const std::string &aValue)
-    {
+    void bind (const char* apName, const std::string& aValue) {
       bind (getIndex (apName), aValue);
     }
     /**
@@ -271,8 +263,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const char *apName, const char *apValue)
-    {
+    void bind (const char* apName, const char* apValue) {
       bind (getIndex (apName), apValue);
     }
     /**
@@ -282,8 +273,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const char *apName, const void *apValue, const int aSize)
-    {
+    void bind (const char* apName, const void* apValue, const int aSize) {
       bind (getIndex (apName), apValue, aSize);
     }
     /**
@@ -295,8 +285,7 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const char *apName, const std::string &aValue)
-    {
+    void bindNoCopy (const char* apName, const std::string& aValue) {
       bindNoCopy (getIndex (apName), aValue);
     }
     /**
@@ -309,8 +298,7 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const char *apName, const char *apValue)
-    {
+    void bindNoCopy (const char* apName, const char* apValue) {
       bindNoCopy (getIndex (apName), apValue);
     }
     /**
@@ -320,22 +308,21 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const char *apName, const void *apValue, const int aSize)
-    {
+    void bindNoCopy (const char* apName, const void* apValue, const int aSize) {
       bindNoCopy (getIndex (apName), apValue, aSize);
     }
     /**
      * @brief Deleted, because the value's lifetime could not be guaranteed.
      * Use bind().
      */
-    void bindNoCopy (const char *apName, std::string &&aValue) = delete;
+    void bindNoCopy (const char* apName, std::string&& aValue) = delete;
     /**
      * @brief Bind a NULL value to a named parameter "?NNN", ":VVV", "@VVV" or
      * "$VVV" in the SQL prepared statement (aIndex >= 1)
      *
      * @see clearBindings() to set all bound parameters to NULL.
      */
-    void bind (const char *apName) // bind NULL value
+    void bind (const char* apName) // bind NULL value
     {
       bind (getIndex (apName));
     }
@@ -344,32 +331,28 @@ namespace SQLite
      * @brief Bind an int value to a named parameter "?NNN", ":VVV", "@VVV" or
      * "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const std::string &aName, const int32_t aValue)
-    {
+    void bind (const std::string& aName, const int32_t aValue) {
       bind (aName.c_str (), aValue);
     }
     /**
      * @brief Bind a 32bits unsigned int value to a named parameter "?NNN",
      * ":VVV", "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const std::string &aName, const uint32_t aValue)
-    {
+    void bind (const std::string& aName, const uint32_t aValue) {
       bind (aName.c_str (), aValue);
     }
     /**
      * @brief Bind a 64bits int value to a named parameter "?NNN", ":VVV",
      * "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const std::string &aName, const int64_t aValue)
-    {
+    void bind (const std::string& aName, const int64_t aValue) {
       bind (aName.c_str (), aValue);
     }
     /**
      * @brief Bind a double (64bits float) value to a named parameter "?NNN",
      * ":VVV", "@VVV" or "$VVV" in the SQL prepared statement (aIndex >= 1)
      */
-    void bind (const std::string &aName, const double aValue)
-    {
+    void bind (const std::string& aName, const double aValue) {
       bind (aName.c_str (), aValue);
     }
     /**
@@ -379,8 +362,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const std::string &aName, const std::string &aValue)
-    {
+    void bind (const std::string& aName, const std::string& aValue) {
       bind (aName.c_str (), aValue);
     }
     /**
@@ -390,8 +372,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const std::string &aName, const char *apValue)
-    {
+    void bind (const std::string& aName, const char* apValue) {
       bind (aName.c_str (), apValue);
     }
     /**
@@ -401,8 +382,7 @@ namespace SQLite
      * @note Uses the SQLITE_TRANSIENT flag, making a copy of the data, for
      * SQLite internal use
      */
-    void bind (const std::string &aName, const void *apValue, const int aSize)
-    {
+    void bind (const std::string& aName, const void* apValue, const int aSize) {
       bind (aName.c_str (), apValue, aSize);
     }
     /**
@@ -414,8 +394,7 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const std::string &aName, const std::string &aValue)
-    {
+    void bindNoCopy (const std::string& aName, const std::string& aValue) {
       bindNoCopy (aName.c_str (), aValue);
     }
     /**
@@ -428,8 +407,7 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const std::string &aName, const char *apValue)
-    {
+    void bindNoCopy (const std::string& aName, const char* apValue) {
       bindNoCopy (aName.c_str (), apValue);
     }
     /**
@@ -439,23 +417,21 @@ namespace SQLite
      * @warning Uses the SQLITE_STATIC flag, avoiding a copy of the data. The
      * string must remains unchanged while executing the statement.
      */
-    void bindNoCopy (const std::string &aName, const void *apValue,
-                     const int aSize)
-    {
+    void bindNoCopy (const std::string& aName, const void* apValue, const int aSize) {
       bindNoCopy (aName.c_str (), apValue, aSize);
     }
     /**
      * @brief Deleted, because the value's lifetime could not be guaranteed.
      * Use bind().
      */
-    void bindNoCopy (const std::string &aName, std::string &&aValue) = delete;
+    void bindNoCopy (const std::string& aName, std::string&& aValue) = delete;
     /**
      * @brief Bind a NULL value to a named parameter "?NNN", ":VVV", "@VVV" or
      * "$VVV" in the SQL prepared statement (aIndex >= 1)
      *
      * @see clearBindings() to set all bound parameters to NULL.
      */
-    void bind (const std::string &aName) // bind NULL value
+    void bind (const std::string& aName) // bind NULL value
     {
       bind (aName.c_str ());
     }
@@ -602,11 +578,10 @@ namespace SQLite
      *  Throw an exception if the specified name is not one of the aliased name
      * of the columns in the result.
      */
-    Column getColumn (const char *apName) const;
+    Column getColumn (const char* apName) const;
 
-#if __cplusplus >= 201402L                                                    \
-  || (defined(_MSC_VER) && _MSC_VER >= 1900) // c++14: Visual Studio 2015
-                                             /**
+#if __cplusplus >= 201402L || (defined(_MSC_VER) && _MSC_VER >= 1900) // c++14: Visual Studio 2015
+                                                                      /**
                                               * @brief Return an instance of T constructed from copies of the first N
                                               * columns
                                               *
@@ -634,8 +609,7 @@ namespace SQLite
      * @brief Helper function used by getColumns<typename T, int N> to expand
      * an integer_sequence used to generate the required Column objects
      */
-    template <typename T, const int... Is>
-    T getColumns (const std::integer_sequence<int, Is...>);
+    template <typename T, const int... Is> T getColumns (const std::integer_sequence<int, Is...>);
 
   public:
 #endif
@@ -663,7 +637,7 @@ namespace SQLite
      *  Throw an exception if the specified name is not one of the aliased name
      * of the columns in the result.
      */
-    bool isColumnNull (const char *apName) const;
+    bool isColumnNull (const char* apName) const;
 
     /**
      * @brief Return a pointer to the named assigned to the specified result
@@ -677,7 +651,7 @@ namespace SQLite
      *  Throw an exception if the specified index is out of the [0,
      * getColumnCount()) range.
      */
-    const char *getColumnName (const int aIndex) const;
+    const char* getColumnName (const int aIndex) const;
 
 #ifdef SQLITE_ENABLE_COLUMN_METADATA
     /**
@@ -693,7 +667,7 @@ namespace SQLite
      *  Throw an exception if the specified index is out of the [0,
      * getColumnCount()) range.
      */
-    const char *getColumnOriginName (const int aIndex) const;
+    const char* getColumnOriginName (const int aIndex) const;
 #endif
 
     /**
@@ -707,7 +681,7 @@ namespace SQLite
      *
      *  Throw an exception if the specified name is not known.
      */
-    int getColumnIndex (const char *apName) const;
+    int getColumnIndex (const char* apName) const;
 
     /**
      * @brief Return the declared type of the specified result column for a
@@ -726,7 +700,7 @@ namespace SQLite
      *  - the column at aIndex is not a table column but an expression or
      * subquery
      */
-    const char *getColumnDeclaredType (const int aIndex) const;
+    const char* getColumnDeclaredType (const int aIndex) const;
 
     /// Get number of rows modified by last INSERT, UPDATE or DELETE statement
     /// (not DROP table).
@@ -735,7 +709,9 @@ namespace SQLite
     ////////////////////////////////////////////////////////////////////////////
 
     /// Return the UTF-8 SQL Query.
-    const std::string &getQuery () const { return mQuery; }
+    const std::string& getQuery () const {
+      return mQuery;
+    }
 
     // Return a UTF-8 string containing the SQL text of prepared statement with
     // bound parameters expanded.
@@ -743,11 +719,17 @@ namespace SQLite
 
     /// Return the number of columns in the result set returned by the prepared
     /// statement
-    int getColumnCount () const { return mColumnCount; }
+    int getColumnCount () const {
+      return mColumnCount;
+    }
     /// true when a row has been fetched with executeStep()
-    bool hasRow () const { return mbHasRow; }
+    bool hasRow () const {
+      return mbHasRow;
+    }
     /// true when the last executeStep() had no more row to fetch
-    bool isDone () const { return mbDone; }
+    bool isDone () const {
+      return mbDone;
+    }
 
     /// Return the number of bind parameters in the statement
     int getBindParameterCount () const noexcept;
@@ -760,7 +742,7 @@ namespace SQLite
     int getExtendedErrorCode () const noexcept;
     /// Return UTF-8 encoded English language explanation of the most recent
     /// failed API call (if any).
-    const char *getErrorMsg () const noexcept;
+    const char* getErrorMsg () const noexcept;
 
     /// Shared pointer to SQLite Prepared Statement Object
     using TStatementPtr = std::shared_ptr<sqlite3_stmt>;
@@ -773,10 +755,8 @@ namespace SQLite
      * @param[in] aRet SQLite return code to test against the SQLITE_OK
      * expected value
      */
-    void check (const int aRet) const
-    {
-      if (SQLite::OK != aRet)
-      {
+    void check (const int aRet) const {
+      if (SQLite::OK != aRet) {
         throw SQLite::Exception (mpSQLite, aRet);
       }
     }
@@ -785,10 +765,8 @@ namespace SQLite
      * @brief Check if there is a row of result returned by executeStep(), else
      * throw a SQLite::Exception.
      */
-    void checkRow () const
-    {
-      if (false == mbHasRow)
-      {
+    void checkRow () const {
+      if (false == mbHasRow) {
         throw SQLite::Exception ("No row to get a column from. executeStep() "
                                  "was not called, or returned false.");
       }
@@ -798,10 +776,8 @@ namespace SQLite
      * @brief Check if there is a Column index is in the range of columns in
      * the result.
      */
-    void checkIndex (const int aIndex) const
-    {
-      if ((aIndex < 0) || (aIndex >= mColumnCount))
-      {
+    void checkIndex (const int aIndex) const {
+      if ((aIndex < 0) || (aIndex >= mColumnCount)) {
         throw SQLite::Exception ("Column index out of range.");
       }
     }
@@ -819,18 +795,15 @@ namespace SQLite
      * Throw an exception if the statement object was not prepared.
      * @return raw pointer to Prepared Statement Object
      */
-    sqlite3_stmt *getPreparedStatement () const;
+    sqlite3_stmt* getPreparedStatement () const;
 
-    std::string mQuery; //!< UTF-8 SQL Query
-    sqlite3 *mpSQLite;  //!< Pointer to SQLite Database Connection Handle
+    std::string mQuery;                //!< UTF-8 SQL Query
+    sqlite3* mpSQLite;                 //!< Pointer to SQLite Database Connection Handle
     TStatementPtr mpPreparedStatement; //!< Shared Pointer to the prepared
                                        //!< SQLite Statement Object
-    int mColumnCount
-      = 0; //!< Number of columns in the result of the prepared statement
-    bool mbHasRow
-      = false; //!< true when a row has been fetched with executeStep()
-    bool mbDone
-      = false; //!< true when the last executeStep() had no more row to fetch
+    int mColumnCount = 0;  //!< Number of columns in the result of the prepared statement
+    bool mbHasRow = false; //!< true when a row has been fetched with executeStep()
+    bool mbDone = false;   //!< true when the last executeStep() had no more row to fetch
 
     /// Map of columns index by name (mutable so getColumnIndex can be const)
     mutable std::map<std::string, int> mColumnNames;

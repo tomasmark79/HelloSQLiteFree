@@ -23,8 +23,7 @@
   #define SQLITE_DETERMINISTIC 0x800
 #endif // SQLITE_DETERMINISTIC
 
-namespace SQLite
-{
+namespace SQLite {
 
   const int OK = SQLITE_OK;
   const int OPEN_READONLY = SQLITE_OPEN_READONLY;
@@ -43,66 +42,60 @@ namespace SQLite
   const int OPEN_NOFOLLOW = 0;
 #endif
 
-  const char *const VERSION = SQLITE_VERSION;
+  const char* const VERSION = SQLITE_VERSION;
   const int VERSION_NUMBER = SQLITE_VERSION_NUMBER;
 
   // Return SQLite version string using runtime call to the compiled library
-  const char *getLibVersion () noexcept { return sqlite3_libversion (); }
+  const char* getLibVersion () noexcept {
+    return sqlite3_libversion ();
+  }
 
   // Return SQLite version number using runtime call to the compiled library
-  int getLibVersionNumber () noexcept { return sqlite3_libversion_number (); }
+  int getLibVersionNumber () noexcept {
+    return sqlite3_libversion_number ();
+  }
 
   // Open the provided database UTF-8 filename with SQLite::OPEN_xxx provided
   // flags.
-  Database::Database (const char *apFilename,
-                      const int aFlags /* = SQLite::OPEN_READONLY*/,
-                      const int aBusyTimeoutMs /* = 0 */,
-                      const char *apVfs /* = nullptr*/)
-    : mFilename (apFilename)
-  {
-    sqlite3 *handle;
+  Database::Database (const char* apFilename, const int aFlags /* = SQLite::OPEN_READONLY*/,
+                      const int aBusyTimeoutMs /* = 0 */, const char* apVfs /* = nullptr*/)
+      : mFilename (apFilename) {
+    sqlite3* handle;
     const int ret = sqlite3_open_v2 (apFilename, &handle, aFlags, apVfs);
     mSQLitePtr.reset (handle);
-    if (SQLITE_OK != ret)
-    {
+    if (SQLITE_OK != ret) {
       throw SQLite::Exception (handle, ret);
     }
-    if (aBusyTimeoutMs > 0)
-    {
+    if (aBusyTimeoutMs > 0) {
       setBusyTimeout (aBusyTimeoutMs);
     }
   }
 
   // Deleter functor to use with smart pointers to close the SQLite database
   // connection in an RAII fashion.
-  void Database::Deleter::operator() (sqlite3 *apSQLite)
-  {
-    const int ret
-      = sqlite3_close (apSQLite); // Calling sqlite3_close() with a nullptr
-                                  // argument is a harmless no-op.
+  void Database::Deleter::operator() (sqlite3* apSQLite) {
+    const int ret = sqlite3_close (apSQLite); // Calling sqlite3_close() with a nullptr
+                                              // argument is a harmless no-op.
 
     // Avoid unreferenced variable warning when build in release mode
     (void)ret;
 
     // Only case of error is SQLITE_BUSY: "database is locked" (some statements
     // are not finalized) Never throw an exception in a destructor :
-    SQLITECPP_ASSERT (
-      SQLITE_OK == ret,
-      "database is locked"); // See SQLITECPP_ENABLE_ASSERT_HANDLER
+    SQLITECPP_ASSERT (SQLITE_OK == ret,
+                      "database is locked"); // See SQLITECPP_ENABLE_ASSERT_HANDLER
   }
 
   // Set a busy handler that sleeps for a specified amount of time when a table
   // is locked.
-  void Database::setBusyTimeout (const int aBusyTimeoutMs)
-  {
+  void Database::setBusyTimeout (const int aBusyTimeoutMs) {
     const int ret = sqlite3_busy_timeout (getHandle (), aBusyTimeoutMs);
     check (ret);
   }
 
   // Shortcut to execute one or multiple SQL statements without results
   // (UPDATE, INSERT, ALTER, COMMIT, CREATE...). Return the number of changes.
-  int Database::exec (const char *apQueries)
-  {
+  int Database::exec (const char* apQueries) {
     const int ret = tryExec (apQueries);
     check (ret);
 
@@ -111,8 +104,7 @@ namespace SQLite
     return sqlite3_changes (getHandle ());
   }
 
-  int Database::tryExec (const char *apQueries) noexcept
-  {
+  int Database::tryExec (const char* apQueries) noexcept {
     return sqlite3_exec (getHandle (), apQueries, nullptr, nullptr, nullptr);
   }
 
@@ -122,8 +114,7 @@ namespace SQLite
   // (when the underlying temporary Statement and Column objects are destroyed)
   // this is an issue only for pointer type result (ie. char* and blob)
   // (use the Column copy-constructor)
-  Column Database::execAndGet (const char *apQuery)
-  {
+  Column Database::execAndGet (const char* apQuery) {
     Statement query (*this, apQuery);
     (void)query.executeStep (); // Can return false if no result, which will
                                 // throw next line in getColumn()
@@ -131,11 +122,8 @@ namespace SQLite
   }
 
   // Shortcut to test if a table exists.
-  bool Database::tableExists (const char *apTableName) const
-  {
-    Statement query (
-      *this,
-      "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?");
+  bool Database::tableExists (const char* apTableName) const {
+    Statement query (*this, "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?");
     query.bind (1, apTableName);
     (void)query.executeStep (); // Cannot return false, as the above query
                                 // always return a result
@@ -144,43 +132,37 @@ namespace SQLite
 
   // Get the rowid of the most recent successful INSERT into the database from
   // the current connection.
-  int64_t Database::getLastInsertRowid () const noexcept
-  {
+  int64_t Database::getLastInsertRowid () const noexcept {
     return sqlite3_last_insert_rowid (getHandle ());
   }
 
   // Get number of rows modified by last INSERT, UPDATE or DELETE statement
   // (not DROP table).
-  int Database::getChanges () const noexcept
-  {
+  int Database::getChanges () const noexcept {
     return sqlite3_changes (getHandle ());
   }
 
   // Get total number of rows modified by all INSERT, UPDATE or DELETE
   // statement since connection.
-  int Database::getTotalChanges () const noexcept
-  {
+  int Database::getTotalChanges () const noexcept {
     return sqlite3_total_changes (getHandle ());
   }
 
   // Return the numeric result code for the most recent failed API call (if
   // any).
-  int Database::getErrorCode () const noexcept
-  {
+  int Database::getErrorCode () const noexcept {
     return sqlite3_errcode (getHandle ());
   }
 
   // Return the extended numeric result code for the most recent failed API
   // call (if any).
-  int Database::getExtendedErrorCode () const noexcept
-  {
+  int Database::getExtendedErrorCode () const noexcept {
     return sqlite3_extended_errcode (getHandle ());
   }
 
   // Return UTF-8 encoded English language explanation of the most recent
   // failed API call (if any).
-  const char *Database::getErrorMsg () const noexcept
-  {
+  const char* Database::getErrorMsg () const noexcept {
     return sqlite3_errmsg (getHandle ());
   }
 
@@ -188,32 +170,26 @@ namespace SQLite
   // representation. Parameter details can be found here:
   // http://www.sqlite.org/c3ref/create_function.html
   void Database::createFunction (
-    const char *apFuncName, int aNbArg, bool abDeterministic, void *apApp,
-    void (*apFunc) (sqlite3_context *, int, sqlite3_value **),
-    void (*apStep) (sqlite3_context *, int, sqlite3_value **) /* = nullptr */,
-    void (*apFinal) (
-      sqlite3_context *) /* = nullptr */, // NOLINT(readability/casting)
-    void (*apDestroy) (void *) /* = nullptr */)
-  {
+      const char* apFuncName, int aNbArg, bool abDeterministic, void* apApp,
+      void (*apFunc) (sqlite3_context*, int, sqlite3_value**),
+      void (*apStep) (sqlite3_context*, int, sqlite3_value**) /* = nullptr */,
+      void (*apFinal) (sqlite3_context*) /* = nullptr */, // NOLINT(readability/casting)
+      void (*apDestroy) (void*) /* = nullptr */) {
     int textRep = SQLITE_UTF8;
     // optimization if deterministic function (e.g. of nondeterministic
     // function random())
-    if (abDeterministic)
-    {
+    if (abDeterministic) {
       textRep = textRep | SQLITE_DETERMINISTIC;
     }
-    const int ret
-      = sqlite3_create_function_v2 (getHandle (), apFuncName, aNbArg, textRep,
-                                    apApp, apFunc, apStep, apFinal, apDestroy);
+    const int ret = sqlite3_create_function_v2 (getHandle (), apFuncName, aNbArg, textRep, apApp,
+                                                apFunc, apStep, apFinal, apDestroy);
     check (ret);
   }
 
   // Load an extension into the sqlite database. Only affects the current
   // connection. Parameter details can be found here:
   // http://www.sqlite.org/c3ref/load_extension.html
-  void Database::loadExtension (const char *apExtensionName,
-                                const char *apEntryPointName)
-  {
+  void Database::loadExtension (const char* apExtensionName, const char* apEntryPointName) {
 #ifdef SQLITE_OMIT_LOAD_EXTENSION
     // Unused
     (void)apExtensionName;
@@ -221,7 +197,7 @@ namespace SQLite
 
     throw SQLite::Exception ("sqlite extensions are disabled");
 #else
-  #ifdef SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION // Since SQLite 3.13
+  #ifdef SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION // Since SQLite 3.13 \
                                                // (2016-05-18):
     // Security warning:
     // It is recommended that the SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION method
@@ -231,81 +207,63 @@ namespace SQLite
     // attackers access to extension loading capabilities. (NOTE: not using
     // nullptr: cannot pass object of non-POD type 'std::__1::nullptr_t'
     // through variadic function)
-    int ret
-      = sqlite3_db_config (getHandle (), SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION,
-                           1, NULL); // NOTE: not using nullptr
+    int ret = sqlite3_db_config (getHandle (), SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION, 1,
+                                 NULL); // NOTE: not using nullptr
   #else
     int ret = sqlite3_enable_load_extension (getHandle (), 1);
   #endif
     check (ret);
 
-    ret = sqlite3_load_extension (getHandle (), apExtensionName,
-                                  apEntryPointName, 0);
+    ret = sqlite3_load_extension (getHandle (), apExtensionName, apEntryPointName, 0);
     check (ret);
 #endif
   }
 
   // Set the key for the current sqlite database instance.
-  void Database::key (const std::string &aKey) const
-  {
+  void Database::key (const std::string& aKey) const {
     int passLen = static_cast<int> (aKey.length ());
 #ifdef SQLITE_HAS_CODEC
-    if (passLen > 0)
-    {
+    if (passLen > 0) {
       const int ret = sqlite3_key (getHandle (), aKey.c_str (), passLen);
       check (ret);
     }
 #else  // SQLITE_HAS_CODEC
-    if (passLen > 0)
-    {
-      throw SQLite::Exception (
-        "No encryption support, recompile with SQLITE_HAS_CODEC to enable.");
+    if (passLen > 0) {
+      throw SQLite::Exception ("No encryption support, recompile with SQLITE_HAS_CODEC to enable.");
     }
 #endif // SQLITE_HAS_CODEC
   }
 
   // Reset the key for the current sqlite database instance.
-  void Database::rekey (const std::string &aNewKey) const
-  {
+  void Database::rekey (const std::string& aNewKey) const {
 #ifdef SQLITE_HAS_CODEC
     int passLen = aNewKey.length ();
-    if (passLen > 0)
-    {
+    if (passLen > 0) {
       const int ret = sqlite3_rekey (getHandle (), aNewKey.c_str (), passLen);
       check (ret);
-    }
-    else
-    {
+    } else {
       const int ret = sqlite3_rekey (getHandle (), nullptr, 0);
       check (ret);
     }
 #else  // SQLITE_HAS_CODEC
     static_cast<void> (aNewKey); // silence unused parameter warning
-    throw SQLite::Exception (
-      "No encryption support, recompile with SQLITE_HAS_CODEC to enable.");
+    throw SQLite::Exception ("No encryption support, recompile with SQLITE_HAS_CODEC to enable.");
 #endif // SQLITE_HAS_CODEC
   }
 
   // Test if a file contains an unencrypted database.
-  bool Database::isUnencrypted (const std::string &aFilename)
-  {
-    if (aFilename.empty ())
-    {
-      throw SQLite::Exception (
-        "Could not open database, the aFilename parameter was empty.");
+  bool Database::isUnencrypted (const std::string& aFilename) {
+    if (aFilename.empty ()) {
+      throw SQLite::Exception ("Could not open database, the aFilename parameter was empty.");
     }
 
-    std::ifstream fileBuffer (aFilename.c_str (),
-                              std::ios::in | std::ios::binary);
+    std::ifstream fileBuffer (aFilename.c_str (), std::ios::in | std::ios::binary);
     char header[16];
-    if (fileBuffer.is_open ())
-    {
+    if (fileBuffer.is_open ()) {
       fileBuffer.seekg (0, std::ios::beg);
       fileBuffer.getline (header, 16);
       fileBuffer.close ();
-    }
-    else
-    {
+    } else {
       throw SQLite::Exception ("Error opening file: " + aFilename);
     }
 
@@ -313,33 +271,26 @@ namespace SQLite
   }
 
   // Parse header data from a database.
-  Header Database::getHeaderInfo (const std::string &aFilename)
-  {
+  Header Database::getHeaderInfo (const std::string& aFilename) {
     Header h;
     unsigned char buf[100];
-    char *pBuf = reinterpret_cast<char *> (&buf[0]);
-    char *pHeaderStr = reinterpret_cast<char *> (&h.headerStr[0]);
+    char* pBuf = reinterpret_cast<char*> (&buf[0]);
+    char* pHeaderStr = reinterpret_cast<char*> (&h.headerStr[0]);
 
-    if (aFilename.empty ())
-    {
+    if (aFilename.empty ()) {
       throw SQLite::Exception ("Filename parameter is empty");
     }
 
     {
-      std::ifstream fileBuffer (aFilename.c_str (),
-                                std::ios::in | std::ios::binary);
-      if (fileBuffer.is_open ())
-      {
+      std::ifstream fileBuffer (aFilename.c_str (), std::ios::in | std::ios::binary);
+      if (fileBuffer.is_open ()) {
         fileBuffer.seekg (0, std::ios::beg);
         fileBuffer.read (pBuf, 100);
         fileBuffer.close ();
-        if (fileBuffer.gcount () < 100)
-        {
+        if (fileBuffer.gcount () < 100) {
           throw SQLite::Exception ("File " + aFilename + " is too short");
         }
-      }
-      else
-      {
+      } else {
         throw SQLite::Exception ("Error opening file " + aFilename);
       }
     }
@@ -348,10 +299,8 @@ namespace SQLite
     // unreadable
     memcpy (pHeaderStr, pBuf, 16);
     pHeaderStr[15] = '\0';
-    if (strncmp (pHeaderStr, "SQLite format 3", 15) != 0)
-    {
-      throw SQLite::Exception ("Invalid or encrypted SQLite header in file "
-                               + aFilename);
+    if (strncmp (pHeaderStr, "SQLite format 3", 15) != 0) {
+      throw SQLite::Exception ("Invalid or encrypted SQLite header in file " + aFilename);
     }
 
     h.pageSizeBytes = (buf[16] << 8) | buf[17];
@@ -362,61 +311,46 @@ namespace SQLite
     h.minEmbeddedPayloadFrac = buf[22];
     h.leafPayloadFrac = buf[23];
 
-    h.fileChangeCounter
-      = (buf[24] << 24) | (buf[25] << 16) | (buf[26] << 8) | (buf[27] << 0);
+    h.fileChangeCounter = (buf[24] << 24) | (buf[25] << 16) | (buf[26] << 8) | (buf[27] << 0);
 
-    h.databaseSizePages
-      = (buf[28] << 24) | (buf[29] << 16) | (buf[30] << 8) | (buf[31] << 0);
+    h.databaseSizePages = (buf[28] << 24) | (buf[29] << 16) | (buf[30] << 8) | (buf[31] << 0);
 
-    h.firstFreelistTrunkPage
-      = (buf[32] << 24) | (buf[33] << 16) | (buf[34] << 8) | (buf[35] << 0);
+    h.firstFreelistTrunkPage = (buf[32] << 24) | (buf[33] << 16) | (buf[34] << 8) | (buf[35] << 0);
 
-    h.totalFreelistPages
-      = (buf[36] << 24) | (buf[37] << 16) | (buf[38] << 8) | (buf[39] << 0);
+    h.totalFreelistPages = (buf[36] << 24) | (buf[37] << 16) | (buf[38] << 8) | (buf[39] << 0);
 
-    h.schemaCookie
-      = (buf[40] << 24) | (buf[41] << 16) | (buf[42] << 8) | (buf[43] << 0);
+    h.schemaCookie = (buf[40] << 24) | (buf[41] << 16) | (buf[42] << 8) | (buf[43] << 0);
 
-    h.schemaFormatNumber
-      = (buf[44] << 24) | (buf[45] << 16) | (buf[46] << 8) | (buf[47] << 0);
+    h.schemaFormatNumber = (buf[44] << 24) | (buf[45] << 16) | (buf[46] << 8) | (buf[47] << 0);
 
     h.defaultPageCacheSizeBytes
-      = (buf[48] << 24) | (buf[49] << 16) | (buf[50] << 8) | (buf[51] << 0);
+        = (buf[48] << 24) | (buf[49] << 16) | (buf[50] << 8) | (buf[51] << 0);
 
-    h.largestBTreePageNumber
-      = (buf[52] << 24) | (buf[53] << 16) | (buf[54] << 8) | (buf[55] << 0);
+    h.largestBTreePageNumber = (buf[52] << 24) | (buf[53] << 16) | (buf[54] << 8) | (buf[55] << 0);
 
-    h.databaseTextEncoding
-      = (buf[56] << 24) | (buf[57] << 16) | (buf[58] << 8) | (buf[59] << 0);
+    h.databaseTextEncoding = (buf[56] << 24) | (buf[57] << 16) | (buf[58] << 8) | (buf[59] << 0);
 
-    h.userVersion
-      = (buf[60] << 24) | (buf[61] << 16) | (buf[62] << 8) | (buf[63] << 0);
+    h.userVersion = (buf[60] << 24) | (buf[61] << 16) | (buf[62] << 8) | (buf[63] << 0);
 
-    h.incrementalVaccumMode
-      = (buf[64] << 24) | (buf[65] << 16) | (buf[66] << 8) | (buf[67] << 0);
+    h.incrementalVaccumMode = (buf[64] << 24) | (buf[65] << 16) | (buf[66] << 8) | (buf[67] << 0);
 
-    h.applicationId
-      = (buf[68] << 24) | (buf[69] << 16) | (buf[70] << 8) | (buf[71] << 0);
+    h.applicationId = (buf[68] << 24) | (buf[69] << 16) | (buf[70] << 8) | (buf[71] << 0);
 
-    h.versionValidFor
-      = (buf[92] << 24) | (buf[93] << 16) | (buf[94] << 8) | (buf[95] << 0);
+    h.versionValidFor = (buf[92] << 24) | (buf[93] << 16) | (buf[94] << 8) | (buf[95] << 0);
 
-    h.sqliteVersion
-      = (buf[96] << 24) | (buf[97] << 16) | (buf[98] << 8) | (buf[99] << 0);
+    h.sqliteVersion = (buf[96] << 24) | (buf[97] << 16) | (buf[98] << 8) | (buf[99] << 0);
 
     return h;
   }
 
-  void Database::backup (const char *apFilename, BackupType aType)
-  {
+  void Database::backup (const char* apFilename, BackupType aType) {
     // Open the database file identified by apFilename
-    Database otherDatabase (apFilename,
-                            SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+    Database otherDatabase (apFilename, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 
     // For a 'Save' operation, data is copied from the current Database to the
     // other. A 'Load' is the reverse.
-    Database &src = (aType == BackupType::Save ? *this : otherDatabase);
-    Database &dest = (aType == BackupType::Save ? otherDatabase : *this);
+    Database& src = (aType == BackupType::Save ? *this : otherDatabase);
+    Database& dest = (aType == BackupType::Save ? otherDatabase : *this);
 
     // Set up the backup procedure to copy between the "main" databases of each
     // connection

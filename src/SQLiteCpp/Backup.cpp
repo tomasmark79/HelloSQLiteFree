@@ -15,44 +15,34 @@
 
 #include <sqlite3.h>
 
-namespace SQLite
-{
+namespace SQLite {
 
   // Initialize resource for SQLite database backup
-  Backup::Backup (Database &aDestDatabase, const char *apDestDatabaseName,
-                  Database &aSrcDatabase, const char *apSrcDatabaseName)
-  {
-    mpSQLiteBackup.reset (
-      sqlite3_backup_init (aDestDatabase.getHandle (), apDestDatabaseName,
-                           aSrcDatabase.getHandle (), apSrcDatabaseName));
-    if (nullptr == mpSQLiteBackup)
-    {
+  Backup::Backup (Database& aDestDatabase, const char* apDestDatabaseName, Database& aSrcDatabase,
+                  const char* apSrcDatabaseName) {
+    mpSQLiteBackup.reset (sqlite3_backup_init (aDestDatabase.getHandle (), apDestDatabaseName,
+                                               aSrcDatabase.getHandle (), apSrcDatabaseName));
+    if (nullptr == mpSQLiteBackup) {
       // If an error occurs, the error code and message are attached to the
       // destination database connection.
       throw SQLite::Exception (aDestDatabase.getHandle ());
     }
   }
 
-  Backup::Backup (Database &aDestDatabase,
-                  const std::string &aDestDatabaseName, Database &aSrcDatabase,
-                  const std::string &aSrcDatabaseName)
-    : Backup (aDestDatabase, aDestDatabaseName.c_str (), aSrcDatabase,
-              aSrcDatabaseName.c_str ())
-  {
+  Backup::Backup (Database& aDestDatabase, const std::string& aDestDatabaseName,
+                  Database& aSrcDatabase, const std::string& aSrcDatabaseName)
+      : Backup (aDestDatabase, aDestDatabaseName.c_str (), aSrcDatabase,
+                aSrcDatabaseName.c_str ()) {
   }
 
-  Backup::Backup (Database &aDestDatabase, Database &aSrcDatabase)
-    : Backup (aDestDatabase, "main", aSrcDatabase, "main")
-  {
+  Backup::Backup (Database& aDestDatabase, Database& aSrcDatabase)
+      : Backup (aDestDatabase, "main", aSrcDatabase, "main") {
   }
 
   // Execute backup step with a given number of source pages to be copied
-  int Backup::executeStep (const int aNumPage /* = -1 */)
-  {
+  int Backup::executeStep (const int aNumPage /* = -1 */) {
     const int res = sqlite3_backup_step (mpSQLiteBackup.get (), aNumPage);
-    if (SQLITE_OK != res && SQLITE_DONE != res && SQLITE_BUSY != res
-        && SQLITE_LOCKED != res)
-    {
+    if (SQLITE_OK != res && SQLITE_DONE != res && SQLITE_BUSY != res && SQLITE_LOCKED != res) {
       throw SQLite::Exception (sqlite3_errstr (res), res);
     }
     return res;
@@ -60,22 +50,18 @@ namespace SQLite
 
   // Get the number of remaining source pages to be copied in this backup
   // process
-  int Backup::getRemainingPageCount () const
-  {
+  int Backup::getRemainingPageCount () const {
     return sqlite3_backup_remaining (mpSQLiteBackup.get ());
   }
 
   // Get the number of total source pages to be copied in this backup process
-  int Backup::getTotalPageCount () const
-  {
+  int Backup::getTotalPageCount () const {
     return sqlite3_backup_pagecount (mpSQLiteBackup.get ());
   }
 
   // Release resource for SQLite database backup
-  void SQLite::Backup::Deleter::operator() (sqlite3_backup *apBackup)
-  {
-    if (apBackup)
-    {
+  void SQLite::Backup::Deleter::operator() (sqlite3_backup* apBackup) {
+    if (apBackup) {
       sqlite3_backup_finish (apBackup);
     }
   }

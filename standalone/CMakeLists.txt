@@ -37,7 +37,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # ==============================================================================
 # Project attributes
 # ==============================================================================
-set(STANDALONE_NAME HelloSQLite)
+set(STANDALONE_NAME HelloSQLiteApp)
 string(TOLOWER "${STANDALONE_NAME}" STANDALONE_NAME_LOWER)
 set(STANDALONE_NAMESPACE dsdotname)
 project(
@@ -63,7 +63,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 # CPM.cmake dependencies - take care conflicts
 # ==============================================================================
 include(../cmake/CPM.cmake)
-CPMAddPackage(NAME CSQLite SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+CPMAddPackage(NAME HelloSQLiteApp SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 cpm_licenses_create_disclaimer_target(
     write-licenses-${STANDALONE_NAME}
     "${CMAKE_CURRENT_BINARY_DIR}/${STANDALONE_NAME}_third_party.txt" "${CPM_PACKAGES}")
@@ -107,7 +107,7 @@ set_target_properties(${STANDALONE_NAME} PROPERTIES OUTPUT_NAME "${STANDALONE_NA
 # ==============================================================================
 # Set linking
 # ==============================================================================
-target_link_libraries(${STANDALONE_NAME} PRIVATE dsdotname::CSQLite cxxopts)
+target_link_libraries(${STANDALONE_NAME} PRIVATE dsdotname::HelloSQLite cxxopts)
 
 # ==============================================================================
 # Add missing installation exports

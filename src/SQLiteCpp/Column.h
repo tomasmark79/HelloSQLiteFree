@@ -21,8 +21,7 @@
 // Forward declarations to avoid inclusion of <sqlite3.h> in a header
 struct sqlite3_stmt;
 
-namespace SQLite
-{
+namespace SQLite {
 
   SQLITECPP_API extern const int INTEGER; ///< SQLITE_INTEGER
   SQLITECPP_API extern const int FLOAT;   ///< SQLITE_FLOAT
@@ -48,8 +47,7 @@ namespace SQLite
    * SQLite precompiled statement in a custom shared pointer (See the inner
    * class "Statement::Ptr").
    */
-  class SQLITECPP_API Column
-  {
+  class SQLITECPP_API Column {
   public:
     /**
      * @brief Encapsulation of a Column in a Row of the result.
@@ -59,7 +57,7 @@ namespace SQLite
      * @param[in] aIndex    Index of the column in the row of result, starting
      * at 0
      */
-    explicit Column (const Statement::TStatementPtr &aStmtPtr, int aIndex);
+    explicit Column (const Statement::TStatementPtr& aStmtPtr, int aIndex);
 
     /**
      * @brief Return a pointer to the named assigned to this result column
@@ -67,7 +65,7 @@ namespace SQLite
      *
      * @see getOriginName() to get original column name (not aliased)
      */
-    const char *getName () const noexcept;
+    const char* getName () const noexcept;
 
 #ifdef SQLITE_ENABLE_COLUMN_METADATA
     /**
@@ -80,7 +78,7 @@ namespace SQLite
      * Debian libsqlite3 binary for instance),
      * - and also when compiling this wrapper.
      */
-    const char *getOriginName () const noexcept;
+    const char* getOriginName () const noexcept;
 #endif
 
     /// Return the integer value of the column.
@@ -101,7 +99,7 @@ namespace SQLite
      * (ie. not finalized), thus you must copy it before using it beyond its
      * scope (to a std::string for instance).
      */
-    const char *getText (const char *apDefaultValue = "") const noexcept;
+    const char* getText (const char* apDefaultValue = "") const noexcept;
     /**
      * @brief Return a pointer to the binary blob value of the column.
      *
@@ -109,7 +107,7 @@ namespace SQLite
      * (ie. not finalized), thus you must copy it before using it beyond its
      * scope (to a std::string for instance).
      */
-    const void *getBlob () const noexcept;
+    const void* getBlob () const noexcept;
     /**
      * @brief Return a std::string for a TEXT or BLOB column.
      *
@@ -134,21 +132,28 @@ namespace SQLite
 
     /// Test if the column is an integer type value (meaningful only before any
     /// conversion)
-    bool isInteger () const noexcept
-    {
+    bool isInteger () const noexcept {
       return (SQLite::INTEGER == getType ());
     }
     /// Test if the column is a floating point type value (meaningful only
     /// before any conversion)
-    bool isFloat () const noexcept { return (SQLite::FLOAT == getType ()); }
+    bool isFloat () const noexcept {
+      return (SQLite::FLOAT == getType ());
+    }
     /// Test if the column is a text type value (meaningful only before any
     /// conversion)
-    bool isText () const noexcept { return (SQLite::TEXT == getType ()); }
+    bool isText () const noexcept {
+      return (SQLite::TEXT == getType ());
+    }
     /// Test if the column is a binary blob type value (meaningful only before
     /// any conversion)
-    bool isBlob () const noexcept { return (SQLite::BLOB == getType ()); }
+    bool isBlob () const noexcept {
+      return (SQLite::BLOB == getType ());
+    }
     /// Test if the column is NULL (meaningful only before any conversion)
-    bool isNull () const noexcept { return (SQLite::Null == getType ()); }
+    bool isNull () const noexcept {
+      return (SQLite::Null == getType ());
+    }
 
     /**
      * @brief Return the number of bytes used by the text (or blob) value of
@@ -166,30 +171,54 @@ namespace SQLite
 
     /// Alias returning the number of bytes used by the text (or blob) value of
     /// the column
-    int size () const noexcept { return getBytes (); }
+    int size () const noexcept {
+      return getBytes ();
+    }
 
     /// Inline cast operators to basic types
-    operator char () const { return static_cast<char> (getInt ()); }
-    operator int8_t () const { return static_cast<int8_t> (getInt ()); }
-    operator uint8_t () const { return static_cast<uint8_t> (getInt ()); }
-    operator int16_t () const { return static_cast<int16_t> (getInt ()); }
-    operator uint16_t () const { return static_cast<uint16_t> (getInt ()); }
-    operator int32_t () const { return getInt (); }
-    operator uint32_t () const { return getUInt (); }
-    operator int64_t () const { return getInt64 (); }
-    operator double () const { return getDouble (); }
+    operator char () const {
+      return static_cast<char> (getInt ());
+    }
+    operator int8_t () const {
+      return static_cast<int8_t> (getInt ());
+    }
+    operator uint8_t () const {
+      return static_cast<uint8_t> (getInt ());
+    }
+    operator int16_t () const {
+      return static_cast<int16_t> (getInt ());
+    }
+    operator uint16_t () const {
+      return static_cast<uint16_t> (getInt ());
+    }
+    operator int32_t () const {
+      return getInt ();
+    }
+    operator uint32_t () const {
+      return getUInt ();
+    }
+    operator int64_t () const {
+      return getInt64 ();
+    }
+    operator double () const {
+      return getDouble ();
+    }
     /**
      * @brief Inline cast operator to char*
      *
      * @see getText
      */
-    operator const char * () const { return getText (); }
+    operator const char* () const {
+      return getText ();
+    }
     /**
      * @brief Inline cast operator to void*
      *
      * @see getBlob
      */
-    operator const void * () const { return getBlob (); }
+    operator const void* () const {
+      return getBlob ();
+    }
 
     /**
      * @brief Inline cast operator to std::string
@@ -198,12 +227,13 @@ namespace SQLite
      *
      * @see getString
      */
-    operator std::string () const { return getString (); }
+    operator std::string () const {
+      return getString ();
+    }
 
   private:
-    Statement::TStatementPtr
-      mStmtPtr; ///< Shared Pointer to the prepared SQLite Statement Object
-    int mIndex; ///< Index of the column in the row of result, starting at 0
+    Statement::TStatementPtr mStmtPtr; ///< Shared Pointer to the prepared SQLite Statement Object
+    int mIndex;                        ///< Index of the column in the row of result, starting at 0
   };
 
   /**
@@ -217,16 +247,13 @@ namespace SQLite
    *
    * @return  Reference to the stream used
    */
-  SQLITECPP_API std::ostream &operator<< (std::ostream &aStream,
-                                          const Column &aColumn);
+  SQLITECPP_API std::ostream& operator<< (std::ostream& aStream, const Column& aColumn);
 
-#if __cplusplus >= 201402L                                                    \
-  || (defined(_MSC_VER) && _MSC_VER >= 1900) // c++14: Visual Studio 2015
+#if __cplusplus >= 201402L || (defined(_MSC_VER) && _MSC_VER >= 1900) // c++14: Visual Studio 2015
 
   // Create an instance of T from the first N columns, see declaration in
   // Statement.h for full details
-  template <typename T, int N> T Statement::getColumns ()
-  {
+  template <typename T, int N> T Statement::getColumns () {
     checkRow ();
     checkIndex (N - 1);
     return getColumns<T> (std::make_integer_sequence<int, N>{});
@@ -234,8 +261,7 @@ namespace SQLite
 
   // Helper function called by getColums<typename T, int N>
   template <typename T, const int... Is>
-  T Statement::getColumns (const std::integer_sequence<int, Is...>)
-  {
+  T Statement::getColumns (const std::integer_sequence<int, Is...>) {
     return T{ Column (mpPreparedStatement, Is)... };
   }
 

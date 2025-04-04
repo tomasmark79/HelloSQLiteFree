@@ -14,8 +14,7 @@
 #include <SQLiteCpp/SQLiteCppExport.h>
 #include <SQLiteCpp/Exception.h>
 
-namespace SQLite
-{
+namespace SQLite {
 
   // Forward declaration
   class Database;
@@ -24,8 +23,7 @@ namespace SQLite
    * @brief Transaction behaviors when opening an SQLite transaction.
    * Names correspond directly to the behavior.
    */
-  enum class TransactionBehavior
-  {
+  enum class TransactionBehavior {
     DEFERRED,
     IMMEDIATE,
     EXCLUSIVE,
@@ -55,8 +53,7 @@ namespace SQLite
    * shares the underling SQLite precompiled statement in a custom shared
    * pointer (See the inner class "Statement::Ptr").
    */
-  class SQLITECPP_API Transaction
-  {
+  class SQLITECPP_API Transaction {
   public:
     /**
      * @brief Begins the SQLite transaction using the default transaction
@@ -67,7 +64,7 @@ namespace SQLite
      * Exception is thrown in case of error, then the Transaction is NOT
      * initiated.
      */
-    explicit Transaction (Database &aDatabase);
+    explicit Transaction (Database& aDatabase);
 
     /**
      * @brief Begins the SQLite transaction with the specified behavior.
@@ -78,11 +75,11 @@ namespace SQLite
      * Exception is thrown in case of error, then the Transaction is NOT
      * initiated.
      */
-    explicit Transaction (Database &aDatabase, TransactionBehavior behavior);
+    explicit Transaction (Database& aDatabase, TransactionBehavior behavior);
 
     // Transaction is non-copyable
-    Transaction (const Transaction &) = delete;
-    Transaction &operator= (const Transaction &) = delete;
+    Transaction (const Transaction&) = delete;
+    Transaction& operator= (const Transaction&) = delete;
 
     /**
      * @brief Safely rollback the transaction if it has not been committed.
@@ -100,7 +97,7 @@ namespace SQLite
     void rollback ();
 
   private:
-    Database &mDatabase;     ///< Reference to the SQLite Database Connection
+    Database& mDatabase;     ///< Reference to the SQLite Database Connection
     bool mbCommited = false; ///< True when commit has been called
   };
 

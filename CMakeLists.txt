@@ -38,7 +38,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # ==============================================================================
 # Project attributes - case size will reflect resource files case size
 # ==============================================================================
-set(LIBRARY_NAME CSQLite)
+set(LIBRARY_NAME HelloSQLite)
 string(TOLOWER "${LIBRARY_NAME}" LIBRARY_NAME_LOWER)
 set(LIBRARY_NAMESPACE dsdotname)
 project(
@@ -162,8 +162,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ==============================================================================
 target_link_libraries(
     ${LIBRARY_NAME}
-    PRIVATE fmt::fmt
-    # PUBLIC sqlite3
+    PUBLIC fmt::fmt
     PRIVATE SQLite::SQLite3
     #   PRIVATE ZLIB::ZLIB
     #   PRIVATE nlohmann_json::nlohmann_json

@@ -16,16 +16,13 @@
 
 #include <sqlite3.h>
 
-namespace SQLite
-{
+namespace SQLite {
 
   // Begins the SQLite transaction
-  Transaction::Transaction (Database &aDatabase, TransactionBehavior behavior)
-    : mDatabase (aDatabase)
-  {
-    const char *stmt;
-    switch (behavior)
-    {
+  Transaction::Transaction (Database& aDatabase, TransactionBehavior behavior)
+      : mDatabase (aDatabase) {
+    const char* stmt;
+    switch (behavior) {
     case TransactionBehavior::DEFERRED:
       stmt = "BEGIN DEFERRED";
       break;
@@ -36,29 +33,22 @@ namespace SQLite
       stmt = "BEGIN EXCLUSIVE";
       break;
     default:
-      throw SQLite::Exception ("invalid/unknown transaction behavior",
-                               SQLITE_ERROR);
+      throw SQLite::Exception ("invalid/unknown transaction behavior", SQLITE_ERROR);
     }
     mDatabase.exec (stmt);
   }
 
   // Begins the SQLite transaction
-  Transaction::Transaction (Database &aDatabase) : mDatabase (aDatabase)
-  {
+  Transaction::Transaction (Database& aDatabase) : mDatabase (aDatabase) {
     mDatabase.exec ("BEGIN TRANSACTION");
   }
 
   // Safely rollback the transaction if it has not been committed.
-  Transaction::~Transaction ()
-  {
-    if (false == mbCommited)
-    {
-      try
-      {
+  Transaction::~Transaction () {
+    if (false == mbCommited) {
+      try {
         mDatabase.exec ("ROLLBACK TRANSACTION");
-      }
-      catch (SQLite::Exception &)
-      {
+      } catch (SQLite::Exception&) {
         // Never throw an exception in a destructor: error if already
         // rollbacked, but no harm is caused by this.
       }
@@ -66,28 +56,20 @@ namespace SQLite
   }
 
   // Commit the transaction.
-  void Transaction::commit ()
-  {
-    if (false == mbCommited)
-    {
+  void Transaction::commit () {
+    if (false == mbCommited) {
       mDatabase.exec ("COMMIT TRANSACTION");
       mbCommited = true;
-    }
-    else
-    {
+    } else {
       throw SQLite::Exception ("Transaction already committed.");
     }
   }
 
   // Rollback the transaction
-  void Transaction::rollback ()
-  {
-    if (false == mbCommited)
-    {
+  void Transaction::rollback () {
+    if (false == mbCommited) {
       mDatabase.exec ("ROLLBACK TRANSACTION");
-    }
-    else
-    {
+    } else {
       throw SQLite::Exception ("Transaction already committed.");
     }
   }

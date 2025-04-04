@@ -20,8 +20,7 @@
 // Forward declaration to avoid inclusion of <sqlite3.h> in a header
 struct sqlite3_backup;
 
-namespace SQLite
-{
+namespace SQLite {
 
   /**
    * @brief RAII encapsulation of a SQLite Database Backup process.
@@ -32,8 +31,7 @@ namespace SQLite
    * See also the a reference implementation of live backup taken from the
    * official site: https://www.sqlite.org/backup.html
    */
-  class SQLITECPP_API Backup
-  {
+  class SQLITECPP_API Backup {
   public:
     /**
      * @brief Initialize a SQLite Backup object.
@@ -53,8 +51,8 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Backup (Database &aDestDatabase, const char *apDestDatabaseName,
-            Database &aSrcDatabase, const char *apSrcDatabaseName);
+    Backup (Database& aDestDatabase, const char* apDestDatabaseName, Database& aSrcDatabase,
+            const char* apSrcDatabaseName);
 
     /**
      * @brief Initialize a SQLite Backup object.
@@ -74,8 +72,8 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Backup (Database &aDestDatabase, const std::string &aDestDatabaseName,
-            Database &aSrcDatabase, const std::string &aSrcDatabaseName);
+    Backup (Database& aDestDatabase, const std::string& aDestDatabaseName, Database& aSrcDatabase,
+            const std::string& aSrcDatabaseName);
 
     /**
      * @brief Initialize a SQLite Backup object for main databases.
@@ -92,11 +90,11 @@ namespace SQLite
      *
      * @throw SQLite::Exception in case of error
      */
-    Backup (Database &aDestDatabase, Database &aSrcDatabase);
+    Backup (Database& aDestDatabase, Database& aSrcDatabase);
 
     // Backup is non-copyable
-    Backup (const Backup &) = delete;
-    Backup &operator= (const Backup &) = delete;
+    Backup (const Backup&) = delete;
+    Backup& operator= (const Backup&) = delete;
 
     /**
      * @brief Execute a step of backup with a given number of source pages to
@@ -127,13 +125,12 @@ namespace SQLite
   private:
     // Deleter functor to use with smart pointers to close the SQLite database
     // backup in an RAII fashion.
-    struct Deleter
-    {
-      void operator() (sqlite3_backup *apBackup);
+    struct Deleter {
+      void operator() (sqlite3_backup* apBackup);
     };
 
     std::unique_ptr<sqlite3_backup, Deleter>
-      mpSQLiteBackup; ///< Pointer to SQLite Database Backup Handle
+        mpSQLiteBackup; ///< Pointer to SQLite Database Backup Handle
   };
 
 } // namespace SQLite
