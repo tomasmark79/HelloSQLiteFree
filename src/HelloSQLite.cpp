@@ -22,6 +22,7 @@ namespace dotname {
       buffer_ = std::make_shared<std::vector<std::string> > ();
 
       this->printAll ();
+      
 
     } else {
       LOG_D_STREAM << "Assets path is empty" << std::endl;

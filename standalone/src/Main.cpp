@@ -70,7 +70,7 @@ int processArguments (int argc, const char* argv[]) {
 }
 
 int main (int argc, const char* argv[]) {
-  LOG.noHeader (true);
+  // LOG.noHeader (true);
   LOG_I_STREAM << "Starting " << Config::standaloneName << " ..." << std::endl;
   if (processArguments (argc, argv) != 0) {
     return 1;
