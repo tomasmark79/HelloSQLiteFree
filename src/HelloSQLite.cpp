@@ -68,7 +68,9 @@ namespace dotname {
   int HelloSQLite::replaceTextInTable (const std::string& tableName, const std::string& columnName,
                                        const std::string& oldText, const std::string& newText) {
     // it is database transaction
-    SQLite::Transaction transaction (*dbPtr_);
+
+    SQLite::Transaction transaction (
+        *dbPtr_); // expects a reference to a SQLite::Database object, not a pointer. By dereferencing dbPtr_ with the * operator, you're passing a reference to the actual database object rather than its pointer.
     try {
       SQLite::Statement query (*dbPtr_, "UPDATE " + tableName + " SET " + columnName + " = ? WHERE "
                                             + columnName + " = ?");
